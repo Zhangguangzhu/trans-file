@@ -35,6 +35,9 @@ class Client(object):
 		for i in filelist:
 			print i
 		UploadFile = raw_input('input file name:> ')
+		if not os.path.exists(UploadFile):
+			print 'file not exist'
+			return
 		fhead = struct.pack('128sl', UploadFile, os.path.getsize(UploadFile))
 		self.CliSock.send(fhead)
 		with open(UploadFile, 'rb') as f:
@@ -46,9 +49,8 @@ class Client(object):
 		print 'send file:%s succeed' % UploadFile
 
 	def download(self):
-		flistLenth = self.CliSock.recv(1)
-		flist = self.CliSock.recv(int(flistLenth))
-		print flist
+		flist = self.CliSock.recv(1024)
+		print flist.strip('\00')
 		fname = raw_input('input file name:> ')
 		fnameinfo = struct.pack('128s', fname)
 		self.CliSock.send(fnameinfo)

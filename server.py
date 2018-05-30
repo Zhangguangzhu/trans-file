@@ -3,8 +3,8 @@
 from socket import *
 import os, struct, threading
 
-class Server(object):
 
+class Server(object):
 	def __init__(self):
 		Host = '127.0.0.1'
 		Port = 8000
@@ -32,14 +32,14 @@ class Server(object):
 					f.write(data)
 			print 'recived file:%s' % filename.strip('\00')
 
-
 	def download(self, CliSock):
 		fliststr = ''
 		for i in os.listdir('.'):
 			if os.path.isfile(i):
 				fliststr += i + '\n'
-		CliSock.send(str(len(fliststr)))
+		fliststr = fliststr + '\00' * (1024 - len(fliststr))
 		CliSock.sendall(fliststr)
+		print str(len(fliststr)), fliststr
 		fname = CliSock.recv(struct.calcsize('128s')).strip('\00')
 		fheadinfo = struct.pack('128sl', fname, os.path.getsize(fname))
 		CliSock.send(fheadinfo)
